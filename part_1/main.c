@@ -7,7 +7,20 @@
 #include <math.h>
 
 int *page_table;
-int *frames;
+int *memory;
+
+int getFrame(int pageno)
+{
+    return page_table[pageno] & 0xff;
+}
+int isModified(int pageno)
+{
+    return (page_table[pageno] >> 9) & 1;
+}
+int isInMemory(int pageno)
+{
+    return (page_table[pageno] >> 8) & 1;
+}
 
 void init()
 {
