@@ -6,8 +6,18 @@
 #include <string.h>
 #include <math.h>
 
-int *page_table;
+#define PAGETABLESIZE 256
+#define TOTALFRAMES 64
+#define PAGESIZE 256
+
+
+short page_table[PAGETABLESIZE];
 int *memory;
+
+
+
+
+
 
 int getFrame(int pageno)
 {
@@ -22,10 +32,6 @@ int isInMemory(int pageno)
     return (page_table[pageno] >> 8) & 1;
 }
 
-void init()
-{
-    page_table = malloc(sizeof(int) * pow(2, 8));
-}
 
 int get_frameOffset(int logical_address)
 {
@@ -35,7 +41,7 @@ int get_frameOffset(int logical_address)
 
 int get_page(int logical_address)
 {
-    return (logical_address & 0XFF00) >> 8;
+    return (logical_address & 0xff00) >> 8;
 }
 
 int main()
@@ -44,11 +50,14 @@ int main()
     char *filename = "addresses.txt";
     int address[10], bit[10];
     FILE *file;
+    
     file = fopen("addresses.txt", "r");
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 1000; i++)
     {
         fscanf(file, "%d %d", &address[i], &bit[i]);
         printf("%d\n", address[i]);
+        if(get_page(address[i]) > 255)
+            printf("hahah");
         fflush(stdout);
     }
 
