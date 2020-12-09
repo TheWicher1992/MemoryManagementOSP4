@@ -8,12 +8,15 @@
 #include "constants.h"
 #include "pagetable.h"
 #include "addressTranslation.h"
+
 signed char **memory;
 int address[TOTALADDRESSES];
 int bit[TOTALADDRESSES];
 int freeFrame = -1;
 int total_page_faults = 0;
 int total_access = 0;
+
+#include "enhancedChance.h"
 
 void readAddresses()
 {

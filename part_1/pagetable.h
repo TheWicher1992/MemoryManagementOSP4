@@ -1,4 +1,3 @@
-#include "constants.h"
 
 unsigned short page_table[PAGETABLESIZE];
 
