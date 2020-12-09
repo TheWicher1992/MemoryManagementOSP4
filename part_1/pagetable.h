@@ -1,6 +1,6 @@
 #include "constants.h"
 
-short page_table[PAGETABLESIZE];
+unsigned short page_table[PAGETABLESIZE];
 
 //Page Table Functions
 int frame(int pageno)
@@ -28,9 +28,9 @@ void incCount(int pageno)
     if (count(pageno) == 3)
         return;
 
-    int c = (count(pageno) + 1);
+    unsigned short c = (count(pageno) + 1);
 
-    short pe = page_table[pageno];
+    unsigned short pe = page_table[pageno];
 
     pe = pe & ~(3 << 10);
     pe = pe | (c << 10);
@@ -56,6 +56,12 @@ void setValidbit(int pageno, int bit)
         page_table[pageno] = page_table[pageno] & ~(1 << 8);
     if (bit == 1)
         page_table[pageno] = page_table[pageno] | (bit << 8);
+}
+
+void setFrame(int pageno, int frame)
+{
+    unsigned short off = ~(0xff) & page_table[pageno];
+    page_table[pageno] = off | frame;
 }
 
 void printTable()

@@ -14,4 +14,4 @@
    0x03a8      0x00a8         Read         0x0      No
    0x1525      0x0b25         Write        0x0      Yes
    0x54c7      0x07c7         Write        0x18     No
-   0xb695      0x0295         Read         0x0      No
+   0xb695      0x0295         Read         0x0      No   
