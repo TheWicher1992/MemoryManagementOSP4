@@ -8,14 +8,6 @@
 #include "constants.h"
 #include "pagetable.h"
 #include "addressTranslation.h"
-
-signed char **memory;
-int address[TOTALADDRESSES];
-int bit[TOTALADDRESSES];
-int freeFrame = -1;
-int total_page_faults = 0;
-int total_access = 0;
-
 #include "enhancedChance.h"
 
 void readAddresses()
@@ -58,7 +50,7 @@ void exec()
 {
     printf("%s\t\t%s\t%s\t%s\t%s\n", "Logical", "Physical", "Read\\Write", "Value", "Page Fault");
 
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < TOTALADDRESSES; i++)
     {
         total_access++;
 
@@ -68,9 +60,9 @@ void exec()
         int physical_address = -1;
         char *rdwrt = bit[i] == 1 ? "Write" : "Read";
         char *fault;
-        char value;
+        unsigned char value;
         int framen;
-        FILE *backingStore = fopen("BACKING_STORE_1.bin", "rb");
+
         if (validbit(pageno) == 1)
         {
             int frameno = frame(pageno);
@@ -78,6 +70,7 @@ void exec()
             framen = frameno;
             physical_address = makePhysicalAddress(frameno, frame_off);
             fault = "NO";
+            incCount(pageno);
             if (bit[i] == 1) //if write then set dirty flag
             {
                 memory[frameno][frame_off] = memory[frameno][frame_off] / 2;
@@ -88,32 +81,39 @@ void exec()
         else
         {
             total_page_faults++;
+            incCount(pageno);
             int frameno = getFreeFrame();
+
             if (frameno < 0)
             {
-                //use page replacement algorithm
+                frameno = allocateFrame(pageno); //use page replacement algorithm
             }
-            else
-            {
-                framen = frameno;
-                physical_address = makePhysicalAddress(frameno, frame_off);
-                setValidbit(pageno, 1);
-                setFrame(pageno, frameno);
-                fault = "YES";
-                fseek(backingStore, pageno * PAGESIZE, SEEK_SET);
-                fread(memory[frameno], sizeof(signed char), PAGESIZE, backingStore);
 
-                if (bit[i] == 1) //IF Write then set dirtyflag
-                {
-                    memory[frameno][frame_off] = memory[frameno][frame_off] / 2;
-                    setDirtybit(pageno, 1);
-                }
-                value = memory[frameno][frame_off];
+            framen = frameno;
+            physical_address = makePhysicalAddress(frameno, frame_off);
+            setValidbit(pageno, 1);
+            setFrame(pageno, frameno);
+            fault = "YES";
+
+            FILE *backingStore = fopen("BACKING_STORE_1.bin", "rb");
+            fseek(backingStore, pageno * PAGESIZE, SEEK_SET);
+            fread(memory[frameno], sizeof(signed char), PAGESIZE, backingStore);
+            fclose(backingStore);
+
+            if (bit[i] == 1) //IF Write then set dirtyflag
+            {
+                // printf("%x\n", memory[frameno][frame_off] >> 1);
+                memory[frameno][frame_off] = memory[frameno][frame_off] / 2;
+                setDirtybit(pageno, 1);
             }
+            value = memory[frameno][frame_off];
         }
 
         printf("0x%x\t\t0x%x\t\t%s\t\t0x%x\t%s\n", logic_address, physical_address, rdwrt, value, fault);
     }
+
+    float pageFaultRate = ((float)total_page_faults / (float)total_access) * 100.0;
+    printf("Total Addresses Accessed: %d\nTotal Page Faults: %d\nPage Fault Rate: %f\n", total_access, total_page_faults, pageFaultRate);
 }
 
 int getFreeFrame()
