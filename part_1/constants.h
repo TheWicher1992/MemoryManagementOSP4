@@ -1,7 +1,7 @@
 #define PAGETABLESIZE 256
 #define TOTALFRAMES 64
 #define PAGESIZE 256
-#define TOTALADDRESSES 10000
+#define TOTALADDRESSES 100000
 signed char **memory;
 int address[TOTALADDRESSES];
 int bit[TOTALADDRESSES];

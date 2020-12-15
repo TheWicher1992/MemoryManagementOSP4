@@ -10,22 +10,21 @@
 #include "addressTranslation.h"
 #include "enhancedChance.h"
 
-void readAddresses()
+void readAddresses(char *filename)
 {
-    char *filename = "addresses.txt";
 
     FILE *file;
 
-    file = fopen("addresses.txt", "r");
+    file = fopen(filename, "r");
     for (int i = 0; i < TOTALADDRESSES; i++)
     {
         fscanf(file, "%X %d", &address[i], &bit[i]);
     }
 }
 
-void init()
+void init(char *filename)
 {
-    readAddresses();
+    readAddresses(filename);
     memory = (signed char **)malloc(sizeof(signed char *) * TOTALFRAMES);
     for (int i = 0; i < TOTALFRAMES; i++)
         memory[i] = (signed char *)malloc(sizeof(signed char) * PAGESIZE);
@@ -40,9 +39,9 @@ void init()
 int getFreeFrame();
 void exec();
 
-int main()
+int main(int argc, char *argv[])
 {
-    init();
+    init(argv[1]);
     exec();
 }
 
